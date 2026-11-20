@@ -314,6 +314,8 @@ function crmDraw(a,mode){return (x,w,h)=>{x.fillStyle='#0f172a';x.fillRect(0,0,w
   x.fillStyle='#64748b';x.font='800 22px Manrope,sans-serif';x.fillText('• • • •',tx+16,ty+62);
   for(let q=0;q<6;q++){const v=12+((q*29+k*17+(a.t||0)*7)%40);x.fillStyle=c[1];x.globalAlpha=.75;x.fillRect(tx+16+q*((tw-32)/6),ty+th-12-v,(tw-32)/6-6,v)}x.globalAlpha=1;
   const on=a.busy&&a.cur&&a.jobs.indexOf(a.cur)===k;if(on){x.fillStyle='#fbbf24';x.beginPath();x.arc(tx+tw-16,ty+20,7,0,7);x.fill()}})}}
+// расмлар жойи (ўзгартирилган): девор бўйлаб аниқ ўрин; ART_SIDE — ўнг ён деворга кўчирилган расм
+const ART_POS={0:[null,2.45],1:[-1.3,null],3:[-1.85,1.65],5:[-2.3,null]},ART_SIDE={4:{si:0,z:-.3}};
 const ART={0:[['ҚУРЪОН','#1f6b4a','#d9b584','book'],['ОҚИБАТ','#7a5230','#f1e3c6','hands']],1:[['БИЗНЕСЛАР','#111827','#d9b584','chart'],['МАҚСАД','#1f2937','#fbbf24','target']],
  4:[['ТАФАККУР','#0b1a33','#e6c27a','bulb'],['ЎСИШ','#0b1a33','#e6c27a','chart']],5:[['БИЛИМ','#1565c0','#fde01a','book'],['КУРСЛАР','#16a34a','#ffffff','cap']]};
 function artDraw(t,bg,fg,ic){return (x,w,h)=>{x.fillStyle=bg;x.fillRect(0,0,w,h);x.strokeStyle=fg;x.lineWidth=4;x.strokeRect(14,14,w-28,h-28);
@@ -404,7 +406,9 @@ function buildOZ(a,i){
    const C=k?['#a5d6a7','#66bb6a','#fdd835','#81c784']:['#90caf9','#42a5f5','#fdd835','#64b5f6'];for(let q=0;q<4;q++){x.fillStyle=C[q];x.fillRect(20+(q%2)*135,90+(q>>1)*135,125,125);
     x.fillStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(82+(q%2)*135,140+(q>>1)*135,22,0,7);x.fill();x.fillRect(57+(q%2)*135,165+(q>>1)*135,50,35)}}));
   const dW=LY.desk[0],dC=LY.desk[1],half=dW==='left'?Z:X,hasDoor=dW==='back'&&(ROWS-1-Math.floor(i/W))===1&&ROWS>1;
-  [-2.3,2.3].map(mx=>{let w2=dC+mx;w2=Math.max(-half+.6,Math.min(half-.6,w2));if(hasDoor&&Math.abs(w2-LY.door)<.98)w2=LY.door+Math.sign(w2-LY.door||1)*.98;return w2-dC}).forEach((mx,si)=>{box(.82,1.02,.05,TH.signs?blk:TH.fond?M(0x2e7d32):gold,mx,1.75,.02,f,false);const p=new THREE.Mesh(new THREE.PlaneGeometry(.72,.92),TH.fond?new THREE.MeshBasicMaterial({map:fondT(si),toneMapped:false}):TH.signs?new THREE.MeshBasicMaterial({map:signT(si),toneMapped:false}):ART[i]?new THREE.MeshBasicMaterial({map:once('art'+i+si,()=>tex(300,380,artDraw(...ART[i][si]))),toneMapped:false}):new THREE.MeshStandardMaterial({map:mosT,roughness:.6}));p.position.set(mx,1.75,.05);f.add(p)});
+  [-2.3,2.3].map((mx,si)=>{let w2=dC+mx;w2=Math.max(-half+.6,Math.min(half-.6,w2));if(hasDoor&&Math.abs(w2-LY.door)<.98)w2=LY.door+Math.sign(w2-LY.door||1)*.98;
+   const ov=(ART_POS[i]||[])[si];if(ov!=null)w2=ov;return w2-dC}).forEach((mx,si)=>{if(ART_SIDE[i]&&ART_SIDE[i].si===si){const sd=ART_SIDE[i],sf=B();sf.position.set(X-.13,0,sd.z);sf.rotation.y=-Math.PI/2;
+    box(.82,1.02,.05,gold,0,1.75,.02,sf,false);const sp=new THREE.Mesh(new THREE.PlaneGeometry(.72,.92),new THREE.MeshBasicMaterial({map:once('art'+i+si,()=>tex(300,380,artDraw(...ART[i][si]))),toneMapped:false}));sp.position.set(0,1.75,.05);sf.add(sp);return}box(.82,1.02,.05,TH.signs?blk:TH.fond?M(0x2e7d32):gold,mx,1.75,.02,f,false);const p=new THREE.Mesh(new THREE.PlaneGeometry(.72,.92),TH.fond?new THREE.MeshBasicMaterial({map:fondT(si),toneMapped:false}):TH.signs?new THREE.MeshBasicMaterial({map:signT(si),toneMapped:false}):ART[i]?new THREE.MeshBasicMaterial({map:once('art'+i+si,()=>tex(300,380,artDraw(...ART[i][si]))),toneMapped:false}):new THREE.MeshStandardMaterial({map:mosT,roughness:.6}));p.position.set(mx,1.75,.05);f.add(p)});
   const dz=.45;box(3.0,.07,.85,M(0xf4efe6,{roughness:.3}),0,.78,dz,f);box(2.9,.62,.05,dark,0,.44,dz+.38,f);box(2.8,.02,.03,led,0,.15,dz+.42,f,false);
   box(.05,.75,.8,gold,-1.48,.38,dz,f,false);box(.05,.75,.8,gold,1.48,.38,dz,f,false);box(.5,.6,.7,dark,1.1,.3,dz,f);
   const monL=once('monL'+LK,()=>texL(400,230,(x,w,h)=>{x.fillStyle=TH.screen;x.fillRect(0,0,w,h);if(LK!=='oz'){drawLogo(x,w/2,h/2,200,0,LK);return}drawLogo(x,w/2,92,130,0);x.textAlign='center';x.fillStyle='#d9b584';x.font='800 34px Manrope,sans-serif';x.fillText('Omonillo Ziyo',w/2,192);x.font='700 18px Manrope,sans-serif';x.fillText('AI OFFICE',w/2,218)}));
@@ -657,11 +661,11 @@ async function sync(){let d;try{const r=await fetch(API+'/feed',{cache:'no-store
  d.seen.forEach(s=>{const i=KEYS.indexOf(s.agent);if(i<0||i>=A.length||A[i].live)return;const a=A[i];a.live=true;a.avg='—';a.log=[];a.busy=false;a.cur=null;
   for(let k=feed.length-1;k>=0;k--)if(feed[k].i===i)feed.splice(k,1);reb=true});
  const evs=d.events.filter(e=>e.id>lastId&&KEYS.indexOf(e.agent)>=0).reverse();
- evs.forEach(e=>{const i=KEYS.indexOf(e.agent),a=A[i];if(!a||!a.live)return;const it={tm:tmB(e.ts),ms:Date.parse(e.ts),i,tx:e.text};
+ evs.forEach(e=>{const i=KEYS.indexOf(e.agent),a=A[i];if(!a||!a.live||/ишга туш/i.test(e.text))return;const it={tm:tmB(e.ts),ms:Date.parse(e.ts),i,tx:e.text};
   if(reb||!lastId){feed.push(it);a.log.push(it)}else push(it)});
  if(d.events.length)lastId=Math.max(lastId,...d.events.map(e=>+e.id));
  A.forEach((a,i)=>{if(!a.live)return;const td=d.today.find(x=>x.agent===KEYS[i]);a.t=td?td.n:0;
-  const le=d.events.find(e=>e.agent===KEYS[i]);const b=!!le&&now-Date.parse(le.ts)<90000;
+  const le=d.events.find(e=>e.agent===KEYS[i]&&!/ишга туш/i.test(e.text));const b=!!le&&now-Date.parse(le.ts)<90000;
   a.busy=b;a.cur=b?[le.text,icoK(le.text),le.text]:null;if(a.log.length)a.log.sort(byT);redraw(i)});
  if(reb){feed.sort(byT);if(view===-1)home();else if(view>=0)detail(view)}}
 sync();setInterval(()=>{if(!document.hidden)sync()},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
