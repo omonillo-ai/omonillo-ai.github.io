@@ -57,6 +57,11 @@ body{margin:0;background:radial-gradient(70% 60% at 35% 45%,#ffffff,transparent 
 .duty time{font-weight:800;font-size:13px}
 .demo{font-size:12px;color:var(--mut);margin-top:14px}
 @media(max-width:760px){#stage{right:0;bottom:44vh}.panel{top:auto;left:0;right:0;bottom:0;width:auto;height:44vh;border-radius:20px 20px 0 0;padding:16px}.tag em{display:none!important}.tag{padding:3px 7px;border-radius:9px;box-shadow:0 3px 10px #0f172a1a}.tag b{font-size:11px;gap:4px}.tag i{width:6px;height:6px}.top h1{margin-bottom:8px}.kpi div:nth-child(3){display:none}}
+.tourb{pointer-events:auto;cursor:pointer;border:0;border-radius:12px;padding:6px 14px;background:#0f172a;color:#fff;font:800 14px Manrope,sans-serif;box-shadow:0 2px 8px #0f172a33}
+.tourb:hover{background:#1e293b}.tourb:focus-visible{outline:2px solid #d9b584;outline-offset:2px}
+#cap{position:fixed;left:50%;bottom:7vh;transform:translate(-50%,12px);opacity:0;transition:opacity .6s,transform .6s;pointer-events:none;text-align:center;background:#0f172ae6;color:#fff;border-radius:18px;padding:14px 28px;max-width:86vw;box-shadow:0 12px 40px #0f172a40;z-index:5}
+#cap.on{opacity:1;transform:translate(-50%,0)}#cap b{display:block;font:800 clamp(22px,3.4vw,40px)/1.15 Manrope,sans-serif;letter-spacing:-.01em}#cap span{display:block;margin-top:4px;font:700 clamp(13px,1.6vw,18px)/1.3 Manrope,sans-serif;color:#d9b584}
+body.touring .panel,body.touring #tags,body.touring .kpi{display:none!important}body.touring #stage{right:0!important;bottom:0!important}
 @media(prefers-reduced-motion:reduce){.feed li.new{animation:none}}
 </style>
 </head>
@@ -67,10 +72,11 @@ body{margin:0;background:radial-gradient(70% 60% at 35% 45%,#ffffff,transparent 
   <header class="top">
     <small>Omonillo Ziyo</small>
     <h1>AI агентлар офиси</h1>
-    <div class="kpi"><div><b id="kA">6</b><span>агент ишда</span></div><div><b id="kW">0</b><span>ҳозир ишлаяпти</span></div><div><b id="kT">0</b><span>бугун вазифа</span></div></div>
+    <div class="kpi"><button class="tourb" id="tourBtn" aria-label="Офис бўйлаб тур">▶ Тур</button><div><b id="kA">6</b><span>агент ишда</span></div><div><b id="kW">0</b><span>ҳозир ишлаяпти</span></div><div><b id="kT">0</b><span>бугун вазифа</span></div></div>
   </header>
 </div>
 <aside class="panel" id="panel"></aside>
+<div id="cap" aria-live="polite"><b></b><span></span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -639,7 +645,7 @@ function pick(i){tags.forEach((t,k)=>t.classList.toggle('sel',k===i));i===-2?rec
 document.addEventListener('click',e=>{const t=e.target.closest('[data-i]');if(t)pick(+t.dataset.i);else if(e.target.closest('[data-r]'))pick(-2)});
 const ray=new THREE.Raycaster(),mv=new THREE.Vector2();let down=null;
 cv.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
-cv.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;const b=cv.getBoundingClientRect();
+cv.addEventListener('pointerup',e=>{if(TOUR.on){stopTour();return}if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;const b=cv.getBoundingClientRect();
  mv.set((e.clientX-b.left)/b.width*2-1,-((e.clientY-b.top)/b.height)*2+1);ray.setFromCamera(mv,cam);const h=ray.intersectObjects(floors);if(h.length)pick(h[0].object.userData.i)});
 function size(){sw=stage.clientWidth;sh=stage.clientHeight;R.setSize(sw,sh,false);cam.aspect=sw/sh;cam.updateProjectionMatrix()}
 addEventListener('resize',()=>{size();if(view===-1){goal.copy(tgt).addScaledVector(dir,homeD());fly=1}});size();
@@ -669,6 +675,29 @@ async function sync(){let d;try{const r=await fetch(API+'/feed',{cache:'no-store
   a.busy=b;a.cur=b?[le.text,icoK(le.text),le.text]:null;if(a.log.length)a.log.sort(byT);redraw(i)});
  if(reb){feed.sort(byT);if(view===-1)home();else if(view>=0)detail(view)}}
 sync();setInterval(()=>{if(!document.hidden)sync()},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+// ===== Тур: офисни секин айланиб, хоналарни бирма-бир кўрсатади (экранни ёзиб олиш учун) =====
+const TOUR={on:false,steps:[],k:0,t0:0,fp:new THREE.Vector3(),ft:new THREE.Vector3()},capEl=$('#cap');
+function cap(t,s){if(!t){capEl.classList.remove('on');return}capEl.querySelector('b').textContent=t;capEl.querySelector('span').textContent=s||'';capEl.classList.add('on')}
+function startTour(){if(TOUR.on)return;document.body.classList.add('touring');size();ctl.enabled=false;fly=0;
+ const C=new THREE.Vector3(-LOB/2,0,0),home=C.clone().addScaledVector(dir,homeD()*.92),st=[],ez=(m)=>m<.5?2*m*m:1-Math.pow(-2*m+2,2)/2;
+ st.push({pos:home,tgt:C,move:2.5,hold:.5,t:'AI агентлар офиси',s:'Omonillo Ziyo'});
+ st.push({orbit:1,c:C,dur:16});
+ if(LOB){const rt=new THREE.Vector3(LOBX,.7,.8);st.push({pos:rt.clone().addScaledVector(fdir,12),tgt:rt,move:3,hold:5,t:'Ресепшн',s:'Кириш зали · меҳмонларни кутиб олади'})}
+ rooms.forEach((r,i)=>{const v=new THREE.Vector3();r.g.getWorldPosition(v);v.y=.7;const a=A[i];
+  st.push({pos:v.clone().addScaledVector(fdir,8.5),tgt:v,move:3,hold:5.5,t:a.n,s:a.r||a.b})});
+ st.push({pos:home,tgt:C,move:3.5,hold:2.5,t:'AI агентлар офиси',s:'Omonillo Ziyo · omonillo-ai.github.io/office'});
+ TOUR.steps=st;TOUR.k=-1;TOUR.ez=ez;TOUR.on=true;nextStep(clk.getElapsedTime())}
+function nextStep(t){TOUR.k++;TOUR.t0=t;TOUR.fp.copy(cam.position);TOUR.ft.copy(ctl.target);const s=TOUR.steps[TOUR.k];
+ if(!s){stopTour();return}if(s.orbit){const d=cam.position.clone().sub(s.c);s.rh=Math.hypot(d.x,d.z);s.y=d.y;s.a0=Math.atan2(d.x,d.z);cap(null)}
+ else{cap(null);setTimeout(()=>{if(TOUR.on&&TOUR.steps[TOUR.k]===s)cap(s.t,s.s)},s.move*600)}}
+function tourTick(t){const s=TOUR.steps[TOUR.k];if(!s)return;const e=t-TOUR.t0;
+ if(s.orbit){const m=Math.min(1,e/s.dur),a=s.a0+TOUR.ez(m)*Math.PI*2;cam.position.set(s.c.x+Math.sin(a)*s.rh,s.y,s.c.z+Math.cos(a)*s.rh);ctl.target.copy(s.c);if(e>=s.dur)nextStep(t);return}
+ const m=Math.min(1,e/s.move),q=TOUR.ez(m);cam.position.lerpVectors(TOUR.fp,s.pos,q);ctl.target.lerpVectors(TOUR.ft,s.tgt,q);
+ if(e>s.move){const hp=Math.min(1,(e-s.move)/s.hold);cam.position.lerp(s.tgt,.1*hp)}  // секин яқинлашиш
+ if(e>=s.move+s.hold)nextStep(t)}
+function stopTour(){if(!TOUR.on)return;TOUR.on=false;cap(null);document.body.classList.remove('touring');size();ctl.enabled=true;pick(-1)}
+$('#tourBtn').addEventListener('click',e=>{e.stopPropagation();startTour()});
+addEventListener('keydown',e=>{if(e.key==='Escape')stopTour()});
 function loop(){const t=clk.getElapsedTime();
  A.forEach((a,i)=>{if(!a.on||a.live||t<a.next)return;const r=rooms[i];
   if(a.busy){a.busy=false;a.t++;push({tm:fmt(),i,tx:a.cur[2]});a.next=t+6+Math.random()*4}
@@ -676,7 +705,7 @@ function loop(){const t=clk.getElapsedTime();
   r.icons.forEach(ic=>ic.visible=a.busy&&ic.userData.k===a.cur[1]);
   const u=r.tvT.userData;tvDraw(a)(u.x,u.c.width,u.c.height);r.tvT.needsUpdate=true;if(r.wT){const w2=r.wT.userData;worksDraw(a,r.TH)(w2.x,w2.c.width,w2.c.height);r.wT.needsUpdate=true}if(r.cT)r.cT.forEach((ct,q)=>{if(!ct)return;const u3=ct.userData;crmDraw(a,q)(u3.x,u3.c.width,u3.c.height);ct.needsUpdate=true});
   tags[i].classList.toggle('busy',a.busy);tags[i].querySelector('em').textContent=a.busy?a.cur[0]:'';refresh(i);kpi()});
- if(fly){cam.position.lerp(goal,.08);ctl.target.lerp(tgt,.1);if(cam.position.distanceTo(goal)<.05)fly=0}
+ if(TOUR.on)tourTick(t);else if(fly){cam.position.lerp(goal,.08);ctl.target.lerp(tgt,.1);if(cam.position.distanceTo(goal)<.05)fly=0}
  ctl.update();
  rooms.forEach((r,i)=>{const a=r.a;if(r.g.userData.glow&&!reduce)r.g.userData.glow(t);
   if(a.on&&!reduce){if(r.bot&&r.bot.userData.anim){r.bot.userData.anim(t,a.busy)}else if(r.bot){const u=r.bot.userData;r.bot.position.y=.08+Math.abs(Math.sin(t*(a.busy?5:1.6)+i))*.04;r.bot.rotation.y+=((a.busy?Math.PI*.72+Math.sin(t*2)*.12:Math.PI+Math.sin(t*.7)*.25)-r.bot.rotation.y)*.06;
