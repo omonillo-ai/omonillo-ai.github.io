@@ -598,9 +598,9 @@ const P=$('#panel');let view=-1;
 const st=a=>!a.on?['off',a.b==='режада'?'Режада':'Бўш']:a.busy?['busy','Ишлаяпти']:['','Кутмоқда'];
 const now=a=>!a.on?a.r:a.busy?a.cur[0]:'Янги вазифа кутмоқда';
 const fli=(e,nw)=>`<li class="${nw?'new':''}"><time>${e.tm}</time><i style="background:${A[e.i].c}"></i><span><b>${A[e.i].n}</b> — ${e.tx}</span></li>`;
-function home(){view=-1;P.innerHTML=`<h2>Жонли лента</h2><div class="demo" style="margin-top:2px">Ҳозир намуна маълумот — ботлар уланганда ҳақиқийси чиқади</div>
+function home(){view=-1;P.innerHTML=`<h2>Жонли лента</h2><div class="demo" style="margin-top:2px">${A.some(a=>a.live)?'Ҳақиқий: '+A.filter(a=>a.live).map(a=>a.n).join(', ')+'. Қолганлари ҳозирча намуна.':'Ҳозир намуна маълумот — ботлар уланганда ҳақиқийси чиқади'}</div>
  <h3>Ресепшн</h3><button class="row" data-r="1"><span class="ava" style="background:#07172b">Р</span><span class="t"><b>Ресепшн</b><span>Кириш зали · меҳмонларни кутиб олади</span></span><span class="pill">Очиқ</span></button>
- <h3>Агентлар</h3>${A.map((a,i)=>{const[k,s]=st(a);return `<button class="row" data-i="${i}"><span class="ava" style="background:${a.c}">${a.n[0]}</span><span class="t"><b>${a.n}</b><span id="rn${i}">${now(a)}</span></span><span class="pill ${k}" id="rp${i}">${s}</span></button>`}).join('')}
+ <h3>Агентлар</h3>${A.map((a,i)=>{const[k,s]=st(a);return `<button class="row" data-i="${i}"><span class="ava" style="background:${a.c}">${a.n[0]}</span><span class="t"><b>${a.n}${a.live?' <span style="color:var(--ok);font-size:11px">● жонли</span>':''}</b><span id="rn${i}">${now(a)}</span></span><span class="pill ${k}" id="rp${i}">${s}</span></button>`}).join('')}
  <h3>Охирги ишлар</h3><ul class="feed" id="feed">${feed.slice(0,30).map(e=>fli(e)).join('')}</ul>`}
 function recep(){view=-2;
  P.innerHTML=`<button class="back" id="bk">← Барча агентлар</button>
@@ -616,7 +616,7 @@ function detail(i){view=i;const a=A[i],[k,s]=st(a);
  <div class="nums"><div><b id="dt">${a.on?a.t:'—'}</b><span>бугун вазифа</span></div><div><b>${a.duty.length||'—'}</b><span>иш тури</span></div><div><b>${a.avg}</b><span>ўртача жавоб</span></div></div>
  ${a.duty.length?`<h3>Доимий ишлари</h3><ul class="duty">${a.duty.map(d=>`<li><time style="color:${a.c}">${d[0]||'•'}</time><span>${d[1]}</span></li>`).join('')}</ul>`:'<p class="demo">Бу хонага кейинги ботни жойлаймиз.</p>'}
  <h3>Охирги ишлари</h3><ul class="feed" id="dl">${a.log.length?a.log.slice(0,12).map(e=>fli(e)).join(''):'<li><span></span><span></span><span style="color:var(--mut)">Ҳали иш йўқ</span></li>'}</ul>
- <p class="demo">Рақамлар ҳозирча намуна.</p>`;$('#bk').onclick=()=>pick(-1)}
+ <p class="demo">${a.live?'Ҳақиқий маълумот — бот ўзи юборади.':'Рақамлар ҳозирча намуна.'}</p>`;$('#bk').onclick=()=>pick(-1)}
 function refresh(i){const a=A[i],[k,s]=st(a);
  if(view===-1){const n=$('#rn'+i),p=$('#rp'+i);if(n){n.textContent=now(a);p.className='pill '+k;p.textContent=s}}
  else if(view===i){$('#dn').textContent=now(a);const p=$('#dp');p.className='pill '+k;p.textContent=s;$('#dt').textContent=a.t}}
@@ -644,8 +644,29 @@ cam.position.set(-LOB/2,0,0).addScaledVector(dir,homeD()*1.25);pick(-1);
 $('#kA').textContent=A.filter(a=>a.on).length;
 function kpi(){$('#kW').textContent=A.filter(a=>a.busy).length;$('#kT').textContent=A.reduce((s,a)=>s+a.t,0)}kpi();A.forEach((a,i)=>{tags[i].classList.toggle('busy',a.busy);tags[i].querySelector('em').textContent=a.busy?a.cur[0]:''});
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,v=new THREE.Vector3(),clk=new THREE.Clock();
+// ===== Ҳақиқий маълумот (офис сервери) =====
+const API='https://officeapi-production.up.railway.app',KEYS=['okibat','crm','beu_ai','eltaxi','akademiya','beu_innovatsiya'];
+let lastId=0;const msOf=x=>x.ms||(()=>{const d=new Date(),[H,M]=x.tm.split(':');d.setHours(+H,+M,0,0);return +d})(),byT=(x,y)=>msOf(y)-msOf(x);const tmB=s=>new Date(s).toLocaleTimeString('ru-RU',{timeZone:'Asia/Bishkek',hour:'2-digit',minute:'2-digit'});
+const icoK=s=>/викторина/i.test(s)?'quiz':/аудио/i.test(s)?'audio':/Қуръон|ҳадис|оят|таржима/i.test(s)?'book':'chat';
+function redraw(i){const a=A[i],r=rooms[i];if(!r)return;r.icons.forEach(ic=>ic.visible=a.busy&&a.cur&&ic.userData.k===a.cur[1]);
+ const u=r.tvT.userData;tvDraw(a)(u.x,u.c.width,u.c.height);r.tvT.needsUpdate=true;if(r.wT){const w2=r.wT.userData;worksDraw(a,r.TH)(w2.x,w2.c.width,w2.c.height);r.wT.needsUpdate=true}
+ if(r.cT)r.cT.forEach((ct,q)=>{if(!ct)return;const u3=ct.userData;crmDraw(a,q)(u3.x,u3.c.width,u3.c.height);ct.needsUpdate=true});
+ tags[i].classList.toggle('busy',a.busy);tags[i].querySelector('em').textContent=a.busy?a.cur[0]:'';refresh(i);kpi()}
+async function sync(){let d;try{const r=await fetch(API+'/feed',{cache:'no-store'});if(!r.ok)return;d=await r.json()}catch(e){return}
+ const now=Date.parse(d.now)||Date.now();let reb=false;
+ d.seen.forEach(s=>{const i=KEYS.indexOf(s.agent);if(i<0||i>=A.length||A[i].live)return;const a=A[i];a.live=true;a.avg='—';a.log=[];a.busy=false;a.cur=null;
+  for(let k=feed.length-1;k>=0;k--)if(feed[k].i===i)feed.splice(k,1);reb=true});
+ const evs=d.events.filter(e=>e.id>lastId&&KEYS.indexOf(e.agent)>=0).reverse();
+ evs.forEach(e=>{const i=KEYS.indexOf(e.agent),a=A[i];if(!a||!a.live)return;const it={tm:tmB(e.ts),ms:Date.parse(e.ts),i,tx:e.text};
+  if(reb||!lastId){feed.push(it);a.log.push(it)}else push(it)});
+ if(d.events.length)lastId=Math.max(lastId,...d.events.map(e=>+e.id));
+ A.forEach((a,i)=>{if(!a.live)return;const td=d.today.find(x=>x.agent===KEYS[i]);a.t=td?td.n:0;
+  const le=d.events.find(e=>e.agent===KEYS[i]);const b=!!le&&now-Date.parse(le.ts)<90000;
+  a.busy=b;a.cur=b?[le.text,icoK(le.text),le.text]:null;if(a.log.length)a.log.sort(byT);redraw(i)});
+ if(reb){feed.sort(byT);if(view===-1)home();else if(view>=0)detail(view)}}
+sync();setInterval(sync,15000);
 function loop(){const t=clk.getElapsedTime();
- A.forEach((a,i)=>{if(!a.on||t<a.next)return;const r=rooms[i];
+ A.forEach((a,i)=>{if(!a.on||a.live||t<a.next)return;const r=rooms[i];
   if(a.busy){a.busy=false;a.t++;push({tm:fmt(),i,tx:a.cur[2]});a.next=t+6+Math.random()*4}
   else{a.busy=true;a.cur=a.jobs[a.ji++%a.jobs.length];a.next=t+25+Math.random()*15}
   r.icons.forEach(ic=>ic.visible=a.busy&&ic.userData.k===a.cur[1]);
