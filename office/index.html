@@ -23,8 +23,8 @@ body{margin:0;background:radial-gradient(70% 60% at 35% 45%,#ffffff,transparent 
 .top small{color:var(--mut);font-weight:700;font-size:13px}
 .top h1{margin:2px 0 12px;font:800 clamp(20px,2.6vw,30px)/1.1 Manrope,sans-serif;letter-spacing:-.02em}
 .kpi{display:flex;gap:8px;flex-wrap:wrap}
-.kpi div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 12px;box-shadow:0 2px 8px #0f172a0a}
-.kpi b{font-size:18px;font-weight:800;margin-right:4px}.kpi span{color:var(--mut);font-size:13px}
+.kpi div{background:#ffffffcc;border:1px solid var(--line);border-radius:9px;padding:3px 8px;box-shadow:none}
+.kpi b{font-size:13px;font-weight:800;margin-right:3px}.kpi span{color:var(--mut);font-size:11px}
 .tag{position:absolute;transform:translate(-50%,-100%);background:#ffffffd9;border:1px solid var(--line);border-radius:8px;padding:2px 7px;box-shadow:0 2px 8px #0f172a14;opacity:.92;pointer-events:auto;cursor:pointer;max-width:200px;transition:border-color .2s}
 .tag b{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;white-space:nowrap}
 .tag i{width:6px;height:6px;border-radius:50%;flex:none}
@@ -56,11 +56,11 @@ body{margin:0;background:radial-gradient(70% 60% at 35% 45%,#ffffff,transparent 
 .duty li{display:grid;grid-template-columns:5.5em minmax(0,1fr);gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
 .duty time{font-weight:800;font-size:13px}
 .demo{font-size:12px;color:var(--mut);margin-top:14px}
-@media(max-width:760px){#stage{right:0;bottom:58px}.panel{top:auto;left:0;right:0;bottom:0;width:auto;height:58px;border-radius:18px 18px 0 0;padding:0 14px 14px;overflow:hidden;transition:height .3s}body.sheet #stage{bottom:52vh}body.sheet .panel{height:52vh;overflow:auto}.grip{display:flex!important}.tag em{display:none!important}.tag{padding:1px 5px;border-radius:6px}.tag b{font-size:9px;gap:3px}.tag i{width:5px;height:5px}.top{top:10px;left:12px;right:12px}.top small{font-size:11px}.top h1{font-size:18px;margin-bottom:6px}.kpi{gap:5px}.kpi div{padding:4px 8px;border-radius:10px}.kpi b{font-size:14px}.kpi span{font-size:11px}.kpi div:nth-child(3){display:none}.tourb{padding:8px 14px;font-size:14px}}
+@media(max-width:760px){#stage{right:0;bottom:58px}.panel{top:auto;left:0;right:0;bottom:0;width:auto;height:58px;border-radius:18px 18px 0 0;padding:0 14px 14px;overflow:hidden;transition:height .3s}body.sheet #stage{bottom:52vh}body.sheet .panel{height:52vh;overflow:auto}.grip{display:flex!important}.tag em{display:none!important}.tag{padding:1px 5px;border-radius:6px}.tag b{font-size:9px;gap:3px}.tag i{width:5px;height:5px}.top{top:8px;left:8px;right:auto}.top small{display:none}.top h1{font-size:12px;margin:0 0 4px;opacity:.75}.kpi{gap:4px;flex-wrap:nowrap}.kpi div{padding:2px 6px;border-radius:7px}.kpi b{font-size:11px}.kpi span{font-size:9px}.kpi div:nth-child(3){display:none}.tourb{padding:4px 10px;font-size:12px;border-radius:8px}}
 .grip{display:none;position:sticky;top:0;z-index:2;align-items:center;justify-content:center;gap:8px;width:calc(100% + 28px);margin:0 -14px 8px;min-height:58px;border:0;background:var(--card);font:800 14px Manrope,sans-serif;color:var(--ink);cursor:pointer}.grip::before{content:'';position:absolute;top:7px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:4px;background:#cbd5e1}.grip span{transition:transform .3s}body.sheet .grip span{transform:rotate(180deg)}
-.tourb{pointer-events:auto;cursor:pointer;border:0;border-radius:12px;padding:6px 14px;background:#0f172a;color:#fff;font:800 14px Manrope,sans-serif;box-shadow:0 2px 8px #0f172a33}
+.tourb{pointer-events:auto;cursor:pointer;border:0;border-radius:9px;padding:4px 11px;background:#0f172a;color:#fff;font:800 14px Manrope,sans-serif;box-shadow:0 2px 8px #0f172a33}
 .tourb:hover{background:#1e293b}.tourb:focus-visible{outline:2px solid #d9b584;outline-offset:2px}
-#cap{position:fixed;left:50%;bottom:7vh;transform:translate(-50%,12px);opacity:0;transition:opacity .6s,transform .6s;pointer-events:none;text-align:center;background:#0f172ae6;color:#fff;border-radius:18px;padding:14px 28px;max-width:86vw;box-shadow:0 12px 40px #0f172a40;z-index:5}
+#cap{position:fixed;left:50%;top:18px;transform:translate(-50%,-12px);opacity:0;transition:opacity .6s,transform .6s;pointer-events:none;text-align:center;background:#0f172ae6;color:#fff;border-radius:18px;padding:14px 28px;max-width:86vw;box-shadow:0 12px 40px #0f172a40;z-index:5}
 #cap.on{opacity:1;transform:translate(-50%,0)}#cap b{display:block;font:800 clamp(22px,3.4vw,40px)/1.15 Manrope,sans-serif;letter-spacing:-.01em}#cap span{display:block;margin-top:4px;font:700 clamp(13px,1.6vw,18px)/1.3 Manrope,sans-serif;color:#d9b584}
 body.embed .panel{display:none!important}body.embed #stage{right:0!important;bottom:0!important}body.embed .top h1,body.embed .top small{display:none}body.embed .kpi div{display:none}body.touring .panel,body.touring #tags,body.touring .kpi{display:none!important}body.touring .top h1{opacity:.35}@media(max-width:760px){#cap{top:max(14px,env(safe-area-inset-top));bottom:auto;width:max-content;max-width:90vw;padding:8px 16px;border-radius:14px}#cap b{font-size:18px}#cap span{font-size:12px}body.touring .top{display:none}}body.touring #stage{right:0!important;bottom:0!important}
 @media(prefers-reduced-motion:reduce){.feed li.new{animation:none}}
@@ -692,9 +692,14 @@ function startTour(){if(TOUR.on)return;document.body.classList.remove('sheet');d
  const list=[];
  const ord=rooms.map((r,i)=>i);const ci=A.findIndex(a=>a.theme&&a.theme.crm);if(ci>0){ord.splice(ci,1);ord.unshift(ci)}   // бренд-хона (CRM) биринчи
  ord.forEach(i=>{const v=new THREE.Vector3();rooms[i].g.getWorldPosition(v);v.y=.7;list.push(stop(v,A[i].n,A[i].r||A[i].b))});
- if(LOB)list.push(stop(new THREE.Vector3(LOBX,.7,.8),'Ресепшн','Кириш зали · меҳмонларни кутиб олади'));
  const at=(c,ang)=>new THREE.Vector3(c.x+Math.sin(ang)*Math.cos(EL)*D,c.y+Math.sin(EL)*D,c.z+Math.cos(ang)*Math.cos(EL)*D);
- st.push({pos:home,tgt:C,move:2.5/TZ,hold:1.2/TZ,t:'AI агентлар офиси',s:'Omonillo Ziyo'});
+ if(LOB){const rt=new THREE.Vector3(LOBX,.7,.8),FZ=(PD+.5)/2,ra=Math.atan2(fdir.x,fdir.z),ph=sw/sh<.8;   // 1) ресепшн: эшик олдидан, «Хуш келибсиз» олд планда
+  const p1=new THREE.Vector3(LOBX,ph?4.6:2.7,FZ+(ph?7.5:7.8)),t1=new THREE.Vector3(LOBX,ph?1.0:2.15,-1.6);
+  st.push({pos:p1,tgt:t1,move:3/TZ,hold:3.5/TZ,t:'Хуш келибсиз',s:'Omonillo Ziyo · AI агентлар офиси'});
+  st.push({pos:new THREE.Vector3(LOBX,1.75,FZ-(ph?.2:1.2)),tgt:new THREE.Vector3(LOBX,1.1,-2.2),move:6/TZ,hold:1.5/TZ});   // аркадан ичкарига, ресепшн столи томон
+  st.push({pos:at(rt,ra),tgt:rt,move:3/TZ,arc:2,hold:0});
+  st.push({orbit:1,c:rt,a0:ra,el:EL,d:D,dur:16/TZ,t:'Ресепшн',s:'Кириш зали · меҳмонларни кутиб олади'})}
+ else st.push({pos:home,tgt:C,move:2.5/TZ,hold:1.2/TZ,t:'AI агентлар офиси',s:'Omonillo Ziyo'});
  list.forEach((p,k)=>{st.push({pos:at(p.c,p.a0),tgt:p.c,move:4.2/TZ,arc:k?7:4,hold:0});   // кўтарилиб, учиб, хонага тушади
   st.push({orbit:1,c:p.c,a0:p.a0,el:EL,d:D,dur:16/TZ,t:p.t,s:p.s})});                      // 1 марта тўлиқ айланади
  st.push({pos:home,tgt:C,move:4/TZ,arc:5,hold:2.5/TZ,t:'AI агентлар офиси',s:'Omonillo Ziyo · omonillo-ai.github.io/office'});
